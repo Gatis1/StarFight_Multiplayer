@@ -11,17 +11,16 @@ public class PlayerControl : MonoBehaviour
     Vector2 aim;
     bool fire;
 
-    [Header("Joystick")]
-    public Joystick MVjoystick;
-    public Joystick AIMjoystick;
+    private void Start()
+    {
+        rig = GetComponent<Rigidbody2D>();
+    }
 
     // Update is called once per frame
     void Update()
     {
         //movement
-        //Gets the x and y position of the "move" stick to register 360 movement.
-        movement.x = MVjoystick.Horizontal;
-        movement.y = MVjoystick.Vertical;
+        movement = new Vector2(Input.GetAxis("horizontal"), Input.GetAxis("vertical"));
 
         //Aim and shoot.
         //When the "aim" stick moves away form the deadzone of (0,0) rotation registers.
@@ -45,7 +44,7 @@ public class PlayerControl : MonoBehaviour
     void FixedUpdate()
     {
         //moves the character based on the postion of the "move" stick.
-        rig.MovePosition(rig.position + movement * moveSpeed * Time.fixedDeltaTime);
+        rig.velocity = movement * moveSpeed;
 
         //rotates the character based on he position of the "aim" stick.
         if (aim != Vector2.zero)
