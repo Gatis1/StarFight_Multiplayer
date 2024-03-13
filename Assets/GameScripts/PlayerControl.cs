@@ -4,41 +4,26 @@ using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
 {
-    public float moveSpeed = 5f;
+    private float moveSpeed = 5f;
     public Rigidbody2D rig;
-    //public Camera camera;
+    public Camera cam;
     Vector2 movement;
     Vector2 aim;
-    bool fire;
 
     private void Start()
     {
         rig = GetComponent<Rigidbody2D>();
+        cam = Camera.main;
     }
 
     // Update is called once per frame
     void Update()
     {
         //movement
-        movement = new Vector2(Input.GetAxis("horizontal"), Input.GetAxis("vertical"));
+        movement = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 
         //Aim and shoot.
-        //When the "aim" stick moves away form the deadzone of (0,0) rotation registers.
-        if (AIMjoystick.Horizontal != 0 || AIMjoystick.Vertical != 0)
-        {
-            aim = new Vector2(AIMjoystick.Horizontal, AIMjoystick.Vertical);
-        }
-        //When the "aim" stick reaches a certian threshold in the circle change fire variable to true to shoot a bullet.
-        float magnitude = aim.magnitude;
-        if(magnitude >= 0.75)
-        {
-            fire =  true;
-        }
-        else
-        {
-            fire = false;
-        }
-        //aim = camera.ScreenToWorldPoint(Input.mousePosition);
+        aim = cam.ScreenToWorldPoint(Input.mousePosition);
     }
 
     void FixedUpdate()
@@ -52,10 +37,5 @@ public class PlayerControl : MonoBehaviour
             float angle = Mathf.Atan2(aim.y, aim.x) * Mathf.Rad2Deg + 90f;
             rig.rotation = angle;
         }
-    }
-
-    public bool getFire()
-    {
-        return fire;
     }
 }

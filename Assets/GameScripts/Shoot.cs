@@ -22,8 +22,7 @@ public class Shoot : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        input = playerScript.getFire();
-        if(input == true && Time.time > FireTime)
+        if(Input.GetButtonDown("Fire1") && Time.time > FireTime)
         {
             FireTime = Time.time + 1f / fireRate;
             pew.Play();

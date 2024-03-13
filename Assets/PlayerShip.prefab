@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4816710454890817554}
   - component: {fileID: 4816710454890817555}
   - component: {fileID: 4816710454890817551}
+  - component: {fileID: 912085787910283840}
   m_Layer: 0
   m_Name: PlayerShip
   m_TagString: Untagged
@@ -125,11 +126,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff4505fe395961545b538a8b82802d1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
   rig: {fileID: 4816710454890817552}
-  camera: {fileID: 0}
-  MVjoystick: {fileID: 0}
-  AIMjoystick: {fileID: 0}
+  cam: {fileID: 0}
 --- !u!114 &4816710454890817555
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,6 +242,27 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &912085787910283840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4816710454890817557}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 0
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &4816710455040451068
 GameObject:
   m_ObjectHideFlags: 0
