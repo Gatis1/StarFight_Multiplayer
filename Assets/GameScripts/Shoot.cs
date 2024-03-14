@@ -6,7 +6,6 @@ using UnityEngine;
 public class Shoot : MonoBehaviour
 {
     PlayerControl playerScript;
-    bool input;
     public Transform firePoint;
     public GameObject PlayerShot;
     [SerializeField] private AudioSource pew;

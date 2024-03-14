@@ -1,14 +1,37 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class PlayerControl : MonoBehaviour
+public class PlayerControl : NetworkBehaviour
 {
     private float moveSpeed = 5f;
     public Rigidbody2D rig;
     public Camera cam;
     Vector2 movement;
     Vector2 aim;
+
+    public NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
+
+
+    public override void OnNetworkSpawn()
+    {
+        if(IsOwner)
+        {
+            Move();
+        }
+    }
+
+    public void Move()
+    {
+        SubmitPositionRequestServerRpc();
+    }
+
+    [Rpc(SendTo.Server)]
+    void SubmitPositionRequestServerRpc(RpcParams rpcParams = default)
+    {
+        transform.position = Position.Value;
+    }
 
     private void Start()
     {
