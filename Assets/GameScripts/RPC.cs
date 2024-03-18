@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Unity.Netcode;
+using UnityEngine;
 
-public class RPC : NetworkBehaviour
+public class RpcTest : NetworkBehaviour
 {
     public override void OnNetworkSpawn()
     {
