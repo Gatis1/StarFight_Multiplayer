@@ -3,27 +3,29 @@ using UnityEngine;
 
 public class PlayerControl : NetworkBehaviour
 {
+    //Attributes and additional game objects used by the player prefab.
     private float _moveSpeed = 5f;
+    private int currHealth;
     private Camera _cam;
     public Rigidbody2D rig;
     public NetworkVariable<int> Health = new NetworkVariable<int>();
     [SerializeField] private ParticleSystem _deathVFX;
     [SerializeField] private AudioSource _deathSFX;
+    [SerializeField] private GameObject HPBar;
     Vector2 movement;
     Vector2 aim;
 
+    /// <summary>
+    /// When the player spawns in the network, if the client does not own the prefab it is disabled so only one prefab is controlled by one player at a time.
+    /// sets the player health to 3.
+    /// </summary>
     public override void OnNetworkSpawn()
     {
         rig = GetComponent<Rigidbody2D>();
         _cam = Camera.main;
         if (!IsOwner) { this.enabled = false; }
         Health.Value = 3;
-    }
-
-    private void Start()
-    {
-        rig = GetComponent<Rigidbody2D>();
-        _cam = Camera.main;
+        currHealth = Health.Value;
     }
 
     // Update is called once per frame
@@ -32,24 +34,19 @@ public class PlayerControl : NetworkBehaviour
         //movement
         movement = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 
-        //Aim and shoot.
+        //Aim and shoot using the mouse position on the main camera.
         aim = _cam.ScreenToWorldPoint(Input.mousePosition) - transform.position;
 
-        if (IsOwner)
-        {
-            ServerMovementRpc(movement, aim);
+        ServerMovementRpc(movement, aim);
 
-            if (Health.Value <= 0) { Death(); }
-        }
+        if (currHealth <= 0) { Death(); }
     }
 
     [Rpc(SendTo.ClientsAndHost)]
     private void ServerMovementRpc(Vector2 movement, Vector2 aim)
     {
-        //moves the character based on the postion of the "move" stick.
         rig.velocity = movement * _moveSpeed;
 
-        //rotates the character based on he position of the "aim" stick.
         if (aim != Vector2.zero)
         {
             float angle = Mathf.Atan2(aim.y, aim.x) * Mathf.Rad2Deg + 90f;
@@ -69,7 +66,8 @@ public class PlayerControl : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void DamageRpc(int value)
     {
-        Health.Value -= value;
+        currHealth -= value;
+        HPBar.transform.localScale = new Vector3((float)currHealth / Health.Value, 1f, 1f);
     }
 
     [Rpc(SendTo.ClientsAndHost)]
