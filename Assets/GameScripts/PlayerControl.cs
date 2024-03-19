@@ -15,6 +15,7 @@ public class PlayerControl : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        rig = GetComponent<Rigidbody2D>();
         _cam = Camera.main;
         if (!IsOwner) { this.enabled = false; }
     }
@@ -36,11 +37,11 @@ public class PlayerControl : NetworkBehaviour
 
         if (Health.Value == 0) { Death(); }
 
-        if (IsOwner) { UpdateMovementServerRpc(movement, aim); }
+        if (IsOwner) { ServerMovementRpc(movement, aim); }
     }
 
-    [ServerRpc]
-    private void UpdateMovementServerRpc(Vector2 movement, Vector2 aim)
+    [Rpc(SendTo.ClientsAndHost)]
+    private void ServerMovementRpc(Vector2 movement, Vector2 aim)
     {
         //moves the character based on the postion of the "move" stick.
         rig.velocity = movement * _moveSpeed;
@@ -49,32 +50,34 @@ public class PlayerControl : NetworkBehaviour
         if (aim != Vector2.zero)
         {
             float angle = Mathf.Atan2(aim.y, aim.x) * Mathf.Rad2Deg + 90f;
-            rig.rotation = angle;
+            transform.rotation = Quaternion.Euler(0,0,angle);
         }
-
-        UpdateMovementClientRpc(rig.position, rig.rotation);
-    }
-
-    [ClientRpc]
-    private void UpdateMovementClientRpc(Vector2 position, float rotation)
-    {
-        rig.position = position;
-        rig.rotation = rotation;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.name == "PlayerShot") 
-        {
-            if (IsOwner) { Health.Value -= 1; } else { DamageServerRpc(); }
+        if (collision.gameObject.name == "PlayerShot(Clone)") 
+        { 
+            DamageRpc(1);
+            ChangeHealthRpc();
         }
-        else { Health.Value -= 3; }
+        else 
+        { 
+            DamageRpc(3);
+            ChangeHealthRpc();
+        }
     }
 
-    [ServerRpc]
-    private void DamageServerRpc()
+    [Rpc(SendTo.ClientsAndHost)]
+    private void DamageRpc(int value)
     {
-        Health.Value -= 1;
+        Health.Value -= value;
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void ChangeHealthRpc()
+    {
+        if(Health.Value == 0) { Death(); }
     }
 
     private void Death()
@@ -83,7 +86,7 @@ public class PlayerControl : NetworkBehaviour
         ParticleSystem vfx = effect.GetComponent<ParticleSystem>();
         vfx.Play();
         _deathSFX.Play();
-        Destroy(effect, 1f);
+        Destroy(effect, 2f);
         NetworkObject.Despawn(gameObject);
     }
 }
