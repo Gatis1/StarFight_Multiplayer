@@ -1,4 +1,3 @@
-using System;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -7,7 +6,7 @@ public class PlayerControl : NetworkBehaviour
     private float _moveSpeed = 5f;
     private Camera _cam;
     public Rigidbody2D rig;
-    [SerializeField] private NetworkVariable<int> Health = new NetworkVariable<int>(3);
+    public NetworkVariable<int> Health = new NetworkVariable<int>();
     [SerializeField] private ParticleSystem _deathVFX;
     [SerializeField] private AudioSource _deathSFX;
     Vector2 movement;
@@ -18,6 +17,7 @@ public class PlayerControl : NetworkBehaviour
         rig = GetComponent<Rigidbody2D>();
         _cam = Camera.main;
         if (!IsOwner) { this.enabled = false; }
+        Health.Value = 3;
     }
 
     private void Start()
@@ -35,9 +35,12 @@ public class PlayerControl : NetworkBehaviour
         //Aim and shoot.
         aim = _cam.ScreenToWorldPoint(Input.mousePosition) - transform.position;
 
-        if (Health.Value == 0) { Death(); }
+        if (IsOwner)
+        {
+            ServerMovementRpc(movement, aim);
 
-        if (IsOwner) { ServerMovementRpc(movement, aim); }
+            if (Health.Value <= 0) { Death(); }
+        }
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -50,20 +53,15 @@ public class PlayerControl : NetworkBehaviour
         if (aim != Vector2.zero)
         {
             float angle = Mathf.Atan2(aim.y, aim.x) * Mathf.Rad2Deg + 90f;
-            transform.rotation = Quaternion.Euler(0,0,angle);
+            transform.rotation = Quaternion.Euler(0, 0, angle);
         }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.name == "PlayerShot(Clone)") 
-        { 
+        if (collision.gameObject.name == "PlayerShot(Clone)")
+        {
             DamageRpc(1);
-            ChangeHealthRpc();
-        }
-        else 
-        { 
-            DamageRpc(3);
             ChangeHealthRpc();
         }
     }
@@ -77,7 +75,7 @@ public class PlayerControl : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void ChangeHealthRpc()
     {
-        if(Health.Value == 0) { Death(); }
+        if (Health.Value == 0) { Death(); }
     }
 
     private void Death()
