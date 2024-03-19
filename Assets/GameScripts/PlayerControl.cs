@@ -38,8 +38,6 @@ public class PlayerControl : NetworkBehaviour
         aim = _cam.ScreenToWorldPoint(Input.mousePosition) - transform.position;
 
         ServerMovementRpc(movement, aim);
-
-        if (currHealth <= 0) { Death(); }
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -73,7 +71,7 @@ public class PlayerControl : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void ChangeHealthRpc()
     {
-        if (Health.Value == 0) { Death(); }
+        if (currHealth <= 0) { Death(); }
     }
 
     private void Death()
@@ -83,6 +81,6 @@ public class PlayerControl : NetworkBehaviour
         vfx.Play();
         _deathSFX.Play();
         Destroy(effect, 2f);
-        NetworkObject.Despawn(gameObject);
+        NetworkObject.enabled = false;
     }
 }
