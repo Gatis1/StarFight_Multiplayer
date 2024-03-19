@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
         GUILayout.EndArea();
     }
 
-    static void StartButtons()
+    public void StartButtons()
     {
         if (GUILayout.Button("Host")) NetworkManager.Singleton.StartHost();
         if (GUILayout.Button("Client")) NetworkManager.Singleton.StartClient();
@@ -26,5 +26,10 @@ public class GameManager : MonoBehaviour
         var mode = NetworkManager.Singleton.IsHost ? "Host" : NetworkManager.Singleton.IsServer ? "Server" : "Client";
         GUILayout.Label("Transport: " + NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetType().Name);
         GUILayout.Label("Mode: " + mode);
+    }
+
+    public void Quit()
+    {
+        Application.Quit();
     }
 }
