@@ -12,6 +12,8 @@ public class PlayerControl : NetworkBehaviour
     [SerializeField] private ParticleSystem _deathVFX;
     [SerializeField] private AudioSource _deathSFX;
     [SerializeField] private AudioSource _criticalSFX;
+    [SerializeField] private AudioSource _moveSFX;
+    [SerializeField] private AudioSource _ramSFX;
     [SerializeField] private GameObject HPBar;
     public bool alive;
     Vector2 movement;
@@ -50,6 +52,7 @@ public class PlayerControl : NetworkBehaviour
     {
         //moves the player prefab based on movement inputs and movement speed
         rig.velocity = movement * _moveSpeed;
+        _moveSFX.Play();
 
         //rotates the player prefab to be ontrack with the mouse position
         if (aim != Vector2.zero)
@@ -66,6 +69,12 @@ public class PlayerControl : NetworkBehaviour
         {
             //calls damage function and sync function
             DamageRpc(1);
+            ChangeHealthRpc();
+        }
+        if(collision.gameObject.name == "PlayerShip(Clone)")
+        {
+            _ramSFX.Play();
+            DamageRpc(2);
             ChangeHealthRpc();
         }
     }
