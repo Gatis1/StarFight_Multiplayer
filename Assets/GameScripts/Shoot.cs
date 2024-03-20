@@ -1,6 +1,9 @@
 using UnityEngine;
 using Unity.Netcode;
 
+/// <summary>
+/// A function that fires a projectile from the player prefab.
+/// </summary>
 public class Shoot : NetworkBehaviour 
 {
     public Transform _firePoint;
@@ -18,6 +21,7 @@ public class Shoot : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
+        //The time and FireTime variables are used to limit the amount of shots fired from the player to one projectile at a time.
         if (Input.GetButtonDown("Fire1") && Time.time > FireTime)
         {
             FireTime = Time.time + 1f / fireRate;
